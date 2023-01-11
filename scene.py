@@ -1,6 +1,6 @@
 from taichi.math import *
 import taichi as ti
-from rt_object import HitRecord
+from object import HitRecord
 
 
 @ti.data_oriented

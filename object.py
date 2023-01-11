@@ -28,20 +28,22 @@ class Sphere(Shape):
     def hit(self, r, t_min: float, t_max: float):
         oc = r.origin - self.center
         a = r.direction.dot(r.direction)
-        b = 2.0 * oc.dot(r.direction)
+        half_b = oc.dot(r.direction)
         c = oc.dot(oc) - self.radius * self.radius
-        discriminant = b * b - 4 * a * c
+        discriminant = half_b * half_b - a * c
 
         is_hit = False
         hit_record = HitRecord()
 
         if discriminant > 0:
             discriminant_sqrt = sqrt(discriminant)
-            temp = (-b - discriminant_sqrt) / (2 * a)
+            temp = (-half_b - discriminant_sqrt) / a
             if temp < t_max and temp > t_min:
                 is_hit = True
                 p = r.at(temp)
                 n = normalize(p - self.center)
+
+                # 判定是否为正面
                 front_face = dot(n, r.direction) < 0.0
                 n = ti.select(front_face, n, -n)
                 front_face = ti.select(front_face, 1, 0)
@@ -53,11 +55,13 @@ class Sphere(Shape):
                 )
 
             if is_hit == False:
-                temp = (-b + discriminant_sqrt) / (2 * a)
+                temp = (-half_b + discriminant_sqrt) / a
                 if temp < t_max and temp > t_min:
                     is_hit = True
                     p = r.at(temp)
                     n = normalize(p - self.center)
+
+                    # 判定是否为正面
                     front_face = dot(n, r.direction) < 0.0
                     n = ti.select(front_face, n, -n)
                     front_face = ti.select(front_face, 1, 0)

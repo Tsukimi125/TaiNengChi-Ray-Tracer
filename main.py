@@ -1,8 +1,8 @@
 from taichi.math import *
 import taichi as ti
-from rt_ray import Ray
-from rt_object import Shape, Sphere, HitRecord
-from rt_scene import Scene
+from ray import Ray
+from object import Shape, Sphere, HitRecord
+from scene import Scene
 
 ti.init(arch=ti.gpu)    # 初始化 Taichi ，GPU 加速
 
