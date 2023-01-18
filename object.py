@@ -1,5 +1,6 @@
 from taichi.math import *
 import taichi as ti
+from material import *
 
 
 @ti.dataclass
@@ -20,9 +21,11 @@ class Shape:
 
 @ti.data_oriented
 class Sphere(Shape):
-    def __init__(self, center: vec3, radius: float):
+    def __init__(self, center: vec3, radius: float, material_id: ti.int64, material_info: Material_Info):
         self.center = center
         self.radius = radius
+        self.material_id = material_id
+        self.material_info = material_info
 
     @ti.func
     def hit(self, r, t_min: float, t_max: float):
@@ -75,56 +78,23 @@ class Sphere(Shape):
         return is_hit, hit_record
 
 
-'''
 @ti.data_oriented
-class Sphere(Shape):
-    def __init__(self, center: vec3, radius: float):
+class Plane(Shape):
+    def __init__(self, center: vec3, normal: float, scale: vec2, material_id: ti.int32, material_info: Material_Info):
         self.center = center
-        self.radius = radius
+        self.normal = normal
+        self.scale = scale
+        self.material_id = material_id
+        self.material_info = material_info
 
     @ti.func
     def hit(self, r, t_min: float, t_max: float):
-        oc = r.origin - self.center
-        a = dot(r.direction, r.direction)
-        b = 2 * dot(oc, r.direction)
-        c = dot(oc, oc) - self.radius * self.radius
-        discriminant = b * b - 4 * a * c
+        plane_p = self.center
+        plane_n = self.normal
+        point_p = r.origin
+        point_d = r.direction
 
         is_hit = False
         hit_record = HitRecord()
 
-        if discriminant > 0:
-            root = sqrt(discriminant)
-            temp = 0.5 * (-b - root) / a
-            if temp < t_max and temp > t_min:
-                is_hit = True
-                p = r.at(temp)
-                n = normalize(p - self.center)
-                front_face = dot(n, r.direction) < 0.0
-                # n = n if front_face else -n
-                # f = 1 if front_face else 0
-                hit_record = HitRecord(
-                    position=p,
-                    normal=n,
-                    t=temp,
-                    front_face=front_face
-                )
-
-            temp = 0.5 * (-b + root) / a
-            if temp < t_max and temp > t_min:
-                is_hit = True
-                p = r.at(temp)
-                # n = (p - self.center) / self.radius
-                n = normalize(p - self.center)
-                front_face = dot(n, r.direction) < 0.0
-                # n = n if front_face else -n
-                # f = 1 if front_face else 0
-                hit_record = HitRecord(
-                    position=p,
-                    normal=n,
-                    t=temp,
-                    front_face=front_face
-                )
-
         return is_hit, hit_record
-'''
